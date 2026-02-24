@@ -134,7 +134,7 @@ def cleanup_batch(folder_path: str, output_folder: str = None, verbose: bool = T
         except Exception as e:
             failed += 1
             if verbose:
-                print(f"  [FAIL] Error: {e}\n")
+                 print(f"  [FAIL] Error: {e}\n")
     
     if verbose:
         print("\n" + "="*60)
