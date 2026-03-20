@@ -2,8 +2,6 @@ import subprocess
 import os
 import time
 import sys
-import shutil
-from datetime import datetime
 
 # --- Configuration ---
 
@@ -21,67 +19,30 @@ OUTPUT_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\outputMesh"
 # 4. Path to save the Meshroom Project File (.mg)
 PROJECT_FILE = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\outputProjectFile\automated_project.mg"
 
-# 4b. Save folder for archived project files and meshes with timestamps
-SAVE_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\savedRuns"
-
 # 5. How many images to wait for before starting
-EXPECTED_IMAGES = 50
+EXPECTED_IMAGES = 100
 
-# 6. Advanced Overrides (Commented out for initial debugging)
-# Note: Meshroom default pipelines append "_1" to node names.
+# 6. Overrides
 NODE_OVERRIDES = {
-    "CameraInit_1.defaultFieldOfView": 66.0,
+    "CameraInit_1.defaultFieldOfView": 75.0,
+    "DepthMapFilter_1.minConsistentViews": 2,
     "FeatureMatching_1.geometricEstimator": "acransac", 
     "FeatureMatching_1.distanceRatio": 0.8,
     "FeatureMatching_1.maxIteration": 50000,
     "FeatureExtraction_1.describerTypes": "sift",
     "FeatureExtraction_1.minRequired2DMotion": 3.0,
-    "MeshFiltering_1.keepLargestMeshOnly": "True"
+    "MeshFiltering_1.keepLargestMeshOnly": "True",
+    "DepthMapFilter_1.minConsistentViews": 2,
+    "Meshing_1.minAngleThreshold": 1.0,
+    "Meshing_1.maxAngleThreshold": 120.0,
 }
-
-# def save_run_with_timestamp():
-#     """Copy the completed project file and mesh to save folder with timestamp."""
-#     try:
-#         # Create save directory if it doesn't exist
-#         os.makedirs(SAVE_DIR, exist_ok=True)
-        
-#         # Generate timestamp
-#         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
-#         # Copy project file
-#         mesh_path = os.path.join(OUTPUT_DIR, "texturedMesh.obj")
-#         if os.path.exists(PROJECT_FILE):
-#             project_filename = f"automated_project_{timestamp}.mg"
-#             project_save_path = os.path.join(SAVE_DIR, project_filename)
-#             shutil.copy2(PROJECT_FILE, project_save_path)
-#             print(f"[INFO] Saved project file: {project_save_path}")
-#         else:
-#             print(f"[WARNING] Project file not found: {PROJECT_FILE}")
-        
-#         # Copy mesh file if it exists
-#         if os.path.exists(mesh_path):
-#             mesh_filename = f"texturedMesh_{timestamp}.obj"
-#             mesh_save_path = os.path.join(SAVE_DIR, mesh_filename)
-#             shutil.copy2(mesh_path, mesh_save_path)
-#             print(f"[INFO] Saved mesh file: {mesh_save_path}")
-            
-#             # Also copy associated MTL file if it exists
-#             mtl_path = os.path.join(OUTPUT_DIR, "texturedMesh.mtl")
-#             if os.path.exists(mtl_path):
-#                 mtl_filename = f"texturedMesh_{timestamp}.mtl"
-#                 mtl_save_path = os.path.join(SAVE_DIR, mtl_filename)
-#                 shutil.copy2(mtl_path, mtl_save_path)
-#                 print(f"[INFO] Saved material file: {mtl_save_path}")
-#         else:
-#             print(f"[WARNING] Mesh file not found: {mesh_path}")
-#     except Exception as e:
-#         print(f"[ERROR] Failed to save run files: {e}")
 
 def run_meshroom_pipeline():
     print("\n" + "="*60)
     print("      STARTING MESHROOM PIPELINE")
     print("="*60)
     print(f"Project File: {PROJECT_FILE}")
+    print("Note: This process is heavy and may take 20-60+ minutes.")
     
     # Ensure all output directories exist before we start
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -89,23 +50,8 @@ def run_meshroom_pipeline():
     project_dir = os.path.dirname(PROJECT_FILE)
     if project_dir:
         os.makedirs(project_dir, exist_ok=True)
-    
-    # Always start with a fresh project file to avoid Meshroom reusing data
-    # from any previous run. Remove an existing file if present, then write a
-    # blank placeholder so the path exists.
-    if os.path.exists(PROJECT_FILE):
-        try:
-            os.remove(PROJECT_FILE)
-            print(f"[INFO] Removed existing project file before run: {PROJECT_FILE}")
-        except Exception as e:
-            print(f"[WARNING] Could not remove existing project file: {e}")
-    try:
-        with open(PROJECT_FILE, 'w') as f:
-            f.write('{}')
-        print(f"[INFO] Created new project file for this run: {PROJECT_FILE}")
-    except Exception as e:
-        print(f"[WARNING] Could not create project file: {e}")
-    
+
+    # Stages to monitor in the console output
     pipeline_nodes = [
         "CameraInit", "FeatureExtraction", "ImageMatching", "FeatureMatching",
         "StructureFromMotion", "PrepareDenseScene", "DepthMap", 
@@ -123,7 +69,7 @@ def run_meshroom_pipeline():
 
     # Append Overrides if they exist
     if NODE_OVERRIDES:
-        cmd.append("--overrides") # Corrected flag from --paramOverrides to --overrides
+        cmd.append("--overrides")
         for key, value in NODE_OVERRIDES.items():
             cmd.append(f"{key}={str(value)}")
 
@@ -178,9 +124,6 @@ def run_meshroom_pipeline():
             print(f"3D Model: {os.path.join(OUTPUT_DIR, 'texturedMesh.obj')}")
             print(f"Project File: {PROJECT_FILE}")
             print("="*60)
-            
-            # Save the completed run to the archive folder with timestamp
-            #save_run_with_timestamp()
 
             # Attempt to open the project file in the GUI
             try:
@@ -231,13 +174,13 @@ def monitor_folder():
                     # Give it 8 seconds to ensure the 50th image is fully written over the network
                     time.sleep(8) 
                     
-                    # Remove old project file to ensure a completely fresh start
-                    if os.path.exists(PROJECT_FILE):
-                        try:
-                            os.remove(PROJECT_FILE)
-                            print(f"[INFO] Removed old project file cache.")
-                        except Exception as e:
-                            print(f"[WARNING] Could not remove old project file (It might be locked by OneDrive): {e}")
+                    # # Remove old project file to ensure a completely fresh start
+                    # if os.path.exists(PROJECT_FILE):
+                    #     try:
+                    #         os.remove(PROJECT_FILE)
+                    #         print(f"[INFO] Removed old project file cache.")
+                    #     except Exception as e:
+                    #         print(f"[WARNING] Could not remove old project file (It might be locked by OneDrive): {e}")
                     
                     # Run the pipeline (Do NOT pre-create the file)
                     run_meshroom_pipeline()
