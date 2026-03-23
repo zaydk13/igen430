@@ -17,7 +17,7 @@ COMPUTE_BIN = os.path.join(os.path.dirname(MESHROOM_BIN), "meshroom_compute.exe"
 # INPUT_IMAGES_DIR = r"Z:\Documents\igen430\image_send"
 # INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\image_send"
 # INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\VSCode\IGEN430\images_20251126_140652"
-INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\compressed_frames(50)"
+INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\image_send (USB 50)"
 
 # 3. Where you want the 3D model (OBJ file) to end up
 OUTPUT_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\outputMesh"
