@@ -5,6 +5,8 @@ import sys
 import json
 import shutil
 from datetime import datetime
+from rembg import remove
+from PIL import Image
 
 # --- Configuration ---
 
@@ -14,10 +16,9 @@ MESHROOM_BIN = r"C:\Users\Zayd\OneDrive\Documents\Meshroom-2025.1.0-Windows\Mesh
 COMPUTE_BIN = os.path.join(os.path.dirname(MESHROOM_BIN), "meshroom_compute.exe")
 
 # 2. Where the RPi is dropping the images
-# INPUT_IMAGES_DIR = r"Z:\Documents\igen430\image_send"
-# INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\image_send"
-# INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\VSCode\IGEN430\images_20251126_140652"
-INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\image_send (USB 50)"
+INPUT_IMAGES_DIR = r"Z:\Documents\igen430PiCode\image_send"
+# INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\image_send-(USB50)"
+# INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\GitHub\igen430\IGEN430\images_20251126_140652"
 
 # 3. Where you want the 3D model (OBJ file) to end up
 OUTPUT_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\outputMesh"
@@ -35,35 +36,36 @@ EXPECTED_IMAGES = 50
 # This will inject directly into the .mg JSON file, bypassing CLI errors.
 NODE_OVERRIDES = {
     "CameraInit": {
-        "defaultFieldOfView": 45.0,
+        "defaultFieldOfView": 50.0,
         # "width": "640",
         # "height": "480"
     },
-    # "FeatureExtraction": {
-    #     "describerTypes": "sift,akaze",
-    #     "describerPreset": "high",
-    #     "minRequired2DMotion": 3.0
-    # },
+    "FeatureExtraction": {
+        "describerTypes": "sift,akaze",
+        "describerPreset": "high",
+        "minRequired2DMotion": 3.0
+    },
     # "FeatureMatching": {
     #     "describerTypes": "sift,akaze",
     #     "distanceRatio": 0.8,
     #     "maxIteration": 2048
     # },
-    # "StructureFromMotion": {
-    #     "describerTypes": "sift,akaze",
-    #     "minAngleInitialPair": 2.0,      # Default is 5.0. Allows video frames to start the 3D build.
-    #     "minAngleForTriangulation": 1.0, # Default is 2.0. Allows tiny camera movements to generate 3D points.
-    #     "minAngleForLandmark": 1.0         # Helps keep tracking points alive
-    # },
+    "StructureFromMotion": {
+        "describerTypes": "sift,akaze",
+        "minAngleInitialPair": 2.0,      # Default is 5.0. Allows video frames to start the 3D build.
+        "minAngleForTriangulation": 1.0, # Default is 2.0. Allows tiny camera movements to generate 3D points.
+        "minAngleForLandmark": 1.0,         # Helps keep tracking points alive
+        "minNumberOfMatches": 30         # Allows the 3D build to start even if it only finds 30 matching dots
+    },
     # "DepthMap": {
     # "downscale": 1  # Default is 2. Setting it to 1 forces full resolution.
     # },
     # "DepthMapFilter": {
     #     "minConsistentViews": 2 # Keeps points alive even if seen in fewer frames
     # },
-    # # "MeshFiltering": {
-    # #     "keepLargestMeshOnly": "True"
-    # # }
+    "MeshFiltering": {
+        "keepLargestMeshOnly": "True"
+    }
     # "Meshing": {
     #     "estimateSpaceFromSfM": "False",
     #     "minAngleThreshold": 0.5,
