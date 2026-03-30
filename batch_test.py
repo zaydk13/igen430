@@ -16,8 +16,8 @@ MESHROOM_BIN = r"C:\Users\Zayd\OneDrive\Documents\Meshroom-2025.1.0-Windows\Mesh
 COMPUTE_BIN = os.path.join(os.path.dirname(MESHROOM_BIN), "meshroom_compute.exe")
 
 # 2. Where the RPi is dropping the images
-INPUT_IMAGES_DIR = r"Z:\Documents\igen430PiCode\image_send"
-# INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\image_send-(USB50)"
+# INPUT_IMAGES_DIR = r"Z:\Documents\igen430PiCode\image_send"
+INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\testImages\image_send-(bluecube)"
 # INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\GitHub\igen430\IGEN430\images_20251126_140652"
 
 # 3. Where you want the 3D model (OBJ file) to end up
