@@ -5,8 +5,8 @@ from scipy.sparse.csgraph import minimum_spanning_tree
 from scipy.sparse import csr_matrix
 
 
-INPUT_PATH = r'C:\Users\Zayd\OneDrive\Documents\IGEN430\savedRuns\texturedMesh_20260324_225321.obj'
-OUTPUT_PATH = r'C:\Users\Zayd\OneDrive\Documents\IGEN430\savedRuns\watertightCleanedCropped_y20p0.obj'
+INPUT_PATH = r'C:\Users\Zayd\OneDrive\Documents\IGEN430\savedRuns\texturedMesh_20260325_004845.obj'
+OUTPUT_PATH = r'C:\Users\Zayd\OneDrive\Documents\IGEN430\savedRuns\watertightCleanedCropped_y10pDOG.obj'
 
 def make_watertight_shrinkwrap(mesh, resolution=100):
     """
@@ -260,10 +260,10 @@ def crop_mesh_bottom_y(mesh, crop_percentage=5.0):
 mesh = trimesh.load(INPUT_PATH)
 
 # Crop mesh bottom using y-axis
-cropped_mesh = crop_mesh_bottom_y(mesh, crop_percentage=20.0)
+cropped_mesh = crop_mesh_bottom_y(mesh, crop_percentage=10.0)
 
-# if cropped_mesh:
-#     cropped_mesh.export(OUTPUT_PATH)
+if cropped_mesh:
+    cropped_mesh.export(OUTPUT_PATH+"cropped.obj")
 #     print(f"Cropped mesh saved to {OUTPUT_PATH}.")
 
 # Clean mesh
