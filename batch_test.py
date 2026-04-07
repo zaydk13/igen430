@@ -5,8 +5,7 @@ import sys
 import json
 import shutil
 from datetime import datetime
-from rembg import remove
-from PIL import Image
+from remove_background import remove_backgrounds
 
 # --- Configuration ---
 
@@ -17,7 +16,7 @@ COMPUTE_BIN = os.path.join(os.path.dirname(MESHROOM_BIN), "meshroom_compute.exe"
 
 # 2. Where the RPi is dropping the images
 # INPUT_IMAGES_DIR = r"Z:\Documents\igen430PiCode\image_send"
-INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\testImages\image_send-(bluecube)"
+INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\testImages\image_send-(xwing)"
 # INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\GitHub\igen430\IGEN430\images_20251126_140652"
 
 # 3. Where you want the 3D model (OBJ file) to end up
@@ -32,8 +31,7 @@ SAVE_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\savedRuns"
 # 5. How many images to wait for before starting
 EXPECTED_IMAGES = 50
 
-# 6. NEW OVERRIDE METHOD: Dictionary of node types and their settings
-# This will inject directly into the .mg JSON file, bypassing CLI errors.
+# 6. Dictionary of node types and their settings
 NODE_OVERRIDES = {
     "CameraInit": {
         "defaultFieldOfView": 50.0,
@@ -63,9 +61,9 @@ NODE_OVERRIDES = {
     # "DepthMapFilter": {
     #     "minConsistentViews": 2 # Keeps points alive even if seen in fewer frames
     # },
-    "MeshFiltering": {
-        "keepLargestMeshOnly": "True"
-    }
+    # "MeshFiltering": {
+    #     "keepLargestMeshOnly": "True"
+    # }
     # "Meshing": {
     #     "estimateSpaceFromSfM": "False",
     #     "minAngleThreshold": 0.5,
@@ -148,7 +146,7 @@ def patch_meshroom_project(project_path):
         print(f"[ERROR] Failed to patch project file: {e}")
         return False
 
-def run_meshroom_pipeline():
+def run_meshroom_pipeline(input_folder):
     print("\n" + "="*60)
     print("      STARTING MESHROOM PIPELINE")
     print("="*60)
@@ -164,7 +162,7 @@ def run_meshroom_pipeline():
     print("[INIT] Generating default project pipeline...")
     init_cmd = [
         MESHROOM_BIN,
-        "--input", INPUT_IMAGES_DIR,
+        "--input", input_folder,
         "--output", OUTPUT_DIR,
         "--save", PROJECT_FILE,
         "--toNode", "CameraInit"  # Stop immediately after building the graph
@@ -288,9 +286,10 @@ def monitor_folder():
                 
                 if current_count >= EXPECTED_IMAGES:
                     print("\n\nThreshold reached! Starting Meshroom pipeline...")
-                    time.sleep(8) 
-                    
-                    run_meshroom_pipeline()
+                    time.sleep(8)
+                    processed_images_dir = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\processed_images"
+                    remove_backgrounds(INPUT_IMAGES_DIR, processed_images_dir)
+                    run_meshroom_pipeline(processed_images_dir)
                     break 
             
             time.sleep(2)
