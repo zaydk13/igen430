@@ -16,11 +16,15 @@ COMPUTE_BIN = os.path.join(os.path.dirname(MESHROOM_BIN), "meshroom_compute.exe"
 
 # 2. Where the RPi is dropping the images
 # INPUT_IMAGES_DIR = r"Z:\Documents\igen430PiCode\image_send"
-INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\testImages\image_send-(xwing)"
+INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\testImages\image_send-(Snorlax 30)"
 # INPUT_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\GitHub\igen430\IGEN430\images_20251126_140652"
 
+# PROCESSED_IMAGES_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\processed_images"
+PROCESSED_IMAGES_DIR = r"Y:\processed_images"
+
 # 3. Where you want the 3D model (OBJ file) to end up
-OUTPUT_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\outputMesh"
+# OUTPUT_DIR = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\outputMesh"
+OUTPUT_DIR = r"Y:"
 
 # 4. Path to save the Meshroom Project File (.mg)
 PROJECT_FILE = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\outputProjectFile\automated_project.mg"
@@ -287,9 +291,8 @@ def monitor_folder():
                 if current_count >= EXPECTED_IMAGES:
                     print("\n\nThreshold reached! Starting Meshroom pipeline...")
                     time.sleep(8)
-                    processed_images_dir = r"C:\Users\Zayd\OneDrive\Documents\IGEN430\processed_images"
-                    remove_backgrounds(INPUT_IMAGES_DIR, processed_images_dir)
-                    run_meshroom_pipeline(processed_images_dir)
+                    remove_backgrounds(INPUT_IMAGES_DIR, PROCESSED_IMAGES_DIR)
+                    run_meshroom_pipeline(PROCESSED_IMAGES_DIR)
                     break 
             
             time.sleep(2)
